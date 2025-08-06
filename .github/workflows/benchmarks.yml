@@ -3,11 +3,8 @@ name: benchmarks
 # Secret access requires allowlist in https://github.com/elastic/oblt-infra/tree/main/conf/resources/repos/apm-server
 
 on:
-  push:
-    branches:
-      - test/fix-semgrep-reported-vulnerabilities
-#  workflow_dispatch:
-#    inputs:
+  workflow_dispatch:
+    inputs:
 #      runStandalone:
 #        description: 'Benchmark against standalone APM Server with Moxy'
 #        required: false
@@ -38,21 +35,21 @@ on:
 #        required: false
 #        type: boolean
 #        default: false
-#      benchmarkAgents:
-#        description: 'Number of benchmark agents sending data to APM Server'
-#        required: false
-#        type: string
-#        # defaults set in Makefile
-#      benchmarkRun:
-#        description: 'Benchmark scenarios that only match regex, e.g. BenchmarkAgentAll'
-#        required: false
-#        type: string
-#        # defaults set in Makefile
-#      warmupTime:
-#        description: 'Benchmark warmup time for APM Server e.g. 3s, 5m, 2h'
-#        required: false
-#        type: string
-#        # defaults set below (Set up env)
+      benchmarkAgents:
+        description: 'Number of benchmark agents sending data to APM Server'
+        required: false
+        type: string
+        # defaults set in Makefile
+      benchmarkRun:
+        description: 'Benchmark scenarios that only match regex, e.g. BenchmarkAgentAll'
+        required: false
+        type: string
+        # defaults set in Makefile
+      warmupTime:
+        description: 'Benchmark warmup time for APM Server e.g. 3s, 5m, 2h'
+        required: false
+        type: string
+        # defaults set below (Set up env)
 #      pgoExport:
 #        description: 'Benchmark with PGO export'
 #        required: false
@@ -153,7 +150,9 @@ jobs:
 #      GOBENCH_USERNAME: ${{ secrets.GOBENCH_USERNAME }}
 #      GOBENCH_HOST: ${{ secrets.GOBENCH_HOST }}
     steps:
+      - uses: actions/checkout@v4
       - name: Define env vars
+        shell: bash
         run: |
           if [ ! -z "$BENCHMARK_AGENTS" ]; then
             echo "BENCHMARK_AGENTS=$BENCHMARK_AGENTS" >> "$GITHUB_ENV"
@@ -165,15 +164,16 @@ jobs:
             echo "BENCHMARK_WARMUP_TIME=$WARMUP_TIME" >> "$GITHUB_ENV"
           fi
         env:
-          BENCHMARK_AGENTS: ${{ inputs.benchmarkAgents }}"
+          BENCHMARK_AGENTS: ${{ inputs.benchmarkAgents }}
           BENCHMARK_RUN: ${{ inputs.benchmarkRun }}
           WARMUP_TIME: ${{ inputs.warmupTime }}
 
       - name: Check env vars are set
+        shell: bash
         run: |
           echo "--- $BENCHMARK_AGENTS"
           echo "--- $BENCHMARK_RUN"
-          echo "--- $WARMUP_TIME"
+          echo "--- $BENCHMARK_WARMUP_TIME"
 #      - uses: actions/checkout@v4
 #
 #      - uses: actions/setup-go@v5
